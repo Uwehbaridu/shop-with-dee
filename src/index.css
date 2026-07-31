@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Manrope:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: #F8F3E9;
+  color: #1C1410;
+  font-family: 'Manrope', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #C7992E;
+  color: #180F0A;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Ornamental divider, echoes the flourish under the shop signage */
+.flourish {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.flourish::before,
+.flourish::after {
+  content: "";
+  height: 1px;
+  width: 64px;
+  background: linear-gradient(90deg, transparent, currentColor);
+}
+.flourish::after {
+  background: linear-gradient(90deg, currentColor, transparent);
+}
+
+.text-outline {
+  -webkit-text-stroke: 1px #C7992E;
+  color: transparent;
+}
+
+/* focus visibility for keyboard nav */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #C7992E;
+  outline-offset: 3px;
+}
+
+.font-display { font-family: 'Playfair Display', serif; }
+.font-script { font-family: 'Cormorant Garamond', serif; font-style: italic; }
