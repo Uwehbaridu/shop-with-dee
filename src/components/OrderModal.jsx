@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { buildWhatsAppLink } from "../config";
+import { useCart } from "../cart";
 
 const SIZES = ["12", "13", "14"];
 
 export default function OrderModal({ product, onClose }) {
+  const { addItem } = useCart();
   const [selectedDesign, setSelectedDesign] = useState(null);
   const [size, setSize] = useState(SIZES[0]);
   const [quantity, setQuantity] = useState(1);
-  const [lightbox, setLightbox] = useState(null); // design object when viewing full image
+  const [lightbox, setLightbox] = useState(null);
+  const [justAdded, setJustAdded] = useState(false);
 
-  // Reset when a new product is opened; Escape closes lightbox first, then the view
   useEffect(() => {
     if (!product) return;
 
@@ -18,22 +20,14 @@ export default function OrderModal({ product, onClose }) {
     setSize(SIZES[0]);
     setQuantity(1);
     setLightbox(null);
+    setJustAdded(false);
 
-    function onKeyDown(e) {
-      if (e.key === "Escape") {
-        if (lightbox) setLightbox(null);
-        else onClose();
-      }
-    }
-    document.addEventListener("keydown", onKeyDown);
     document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
     };
-  }, [product, onClose]);
+  }, [product]);
 
-  // Keep Escape handler in sync with lightbox state
   useEffect(() => {
     function onKeyDown(e) {
       if (e.key !== "Escape") return;
@@ -48,11 +42,22 @@ export default function OrderModal({ product, onClose }) {
 
   const { name, price, designs = [] } = product;
   const total = price * quantity;
-  const canOrder = Boolean(selectedDesign);
+  const canAdd = Boolean(selectedDesign);
+
+  function handleAddToCart() {
+    if (!canAdd) return;
+    addItem({
+      product,
+      design: selectedDesign,
+      size,
+      quantity,
+    });
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 1500);
+  }
 
   return (
     <>
-      {/* Full product view */}
       <div
         className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-ink/70 backdrop-blur-sm"
         onClick={onClose}
@@ -65,7 +70,6 @@ export default function OrderModal({ product, onClose }) {
           aria-modal="true"
           aria-labelledby="order-modal-title"
         >
-          {/* Close */}
           <button
             onClick={onClose}
             aria-label="Close"
@@ -74,7 +78,6 @@ export default function OrderModal({ product, onClose }) {
             &#10005;
           </button>
 
-          {/* Hero / selected design preview */}
           <button
             type="button"
             onClick={() => selectedDesign && setLightbox(selectedDesign)}
@@ -89,9 +92,6 @@ export default function OrderModal({ product, onClose }) {
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
               />
             ) : null}
-            {selectedDesign?.swatchBorder && (
-              <div className="absolute inset-0 ring-1 ring-inset ring-ink/10" aria-hidden="true" />
-            )}
             <span className="absolute bottom-3 right-3 bg-white/90 text-ink text-[11px] font-medium px-2.5 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
               Tap to enlarge
             </span>
@@ -111,7 +111,6 @@ export default function OrderModal({ product, onClose }) {
               &#8358;{price.toLocaleString()}
             </p>
 
-            {/* Designs – all on one row / grid */}
             <div className="mt-6">
               <p className="text-sm font-medium text-ink/70 mb-3">Choose a design</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -141,12 +140,6 @@ export default function OrderModal({ product, onClose }) {
                               className="w-full h-full object-cover"
                             />
                           ) : null}
-                          {d.swatchBorder && (
-                            <div
-                              className="absolute inset-0 ring-1 ring-inset ring-ink/10"
-                              aria-hidden="true"
-                            />
-                          )}
                         </div>
                       </button>
                       <div className="flex items-center justify-between gap-1 px-0.5">
@@ -157,7 +150,7 @@ export default function OrderModal({ product, onClose }) {
                         >
                           {d.name}
                         </span>
-                        {(d.image || d.swatch) && (
+                        {d.image && (
                           <button
                             type="button"
                             onClick={(e) => {
@@ -177,7 +170,6 @@ export default function OrderModal({ product, onClose }) {
               </div>
             </div>
 
-            {/* Size */}
             <div className="mt-6">
               <p className="text-sm font-medium text-ink/70 mb-2">Size</p>
               <div className="flex gap-2">
@@ -199,7 +191,6 @@ export default function OrderModal({ product, onClose }) {
               </div>
             </div>
 
-            {/* Quantity */}
             <div className="mt-6">
               <p className="text-sm font-medium text-ink/70 mb-2">Quantity</p>
               <div className="flex items-center gap-4">
@@ -223,7 +214,6 @@ export default function OrderModal({ product, onClose }) {
               </div>
             </div>
 
-            {/* Total + Order */}
             <div className="mt-7 flex items-center justify-between border-t border-ink/10 pt-4">
               <span className="text-ink/60 text-sm">Total</span>
               <span className="font-display text-xl text-ink">
@@ -231,9 +221,24 @@ export default function OrderModal({ product, onClose }) {
               </span>
             </div>
 
+            {/* Primary: Add to cart */}
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={!canAdd}
+              className={`mt-5 w-full inline-flex items-center justify-center gap-2 rounded-full py-3.5 font-medium transition-colors ${
+                canAdd
+                  ? "bg-espresso text-cream hover:bg-espresso-dark"
+                  : "bg-ink/15 text-ink/40 pointer-events-none"
+              }`}
+            >
+              {justAdded ? "Added to cart ✓" : "Add to cart"}
+            </button>
+
+            {/* Secondary: order this one only on WhatsApp */}
             <a
               href={
-                canOrder
+                canAdd
                   ? buildWhatsAppLink(product, {
                       design: selectedDesign?.name,
                       size,
@@ -243,21 +248,20 @@ export default function OrderModal({ product, onClose }) {
               }
               target="_blank"
               rel="noreferrer"
-              onClick={canOrder ? onClose : undefined}
-              aria-disabled={!canOrder}
-              className={`mt-5 w-full inline-flex items-center justify-center gap-2 rounded-full py-3.5 font-medium transition-colors ${
-                canOrder
-                  ? "bg-gold text-espresso-dark hover:bg-gold-light"
-                  : "bg-ink/15 text-ink/40 pointer-events-none"
+              onClick={canAdd ? onClose : undefined}
+              aria-disabled={!canAdd}
+              className={`mt-3 w-full inline-flex items-center justify-center gap-2 rounded-full py-3 font-medium transition-colors border ${
+                canAdd
+                  ? "border-gold/70 text-espresso-dark hover:bg-gold/10"
+                  : "border-ink/10 text-ink/30 pointer-events-none"
               }`}
             >
-              Order Now on WhatsApp
+              Order this one on WhatsApp
             </a>
           </div>
         </div>
       </div>
 
-      {/* Full-image lightbox */}
       {lightbox && (
         <div
           className="fixed inset-0 z-[110] flex items-center justify-center bg-ink/90 backdrop-blur-sm p-4"
