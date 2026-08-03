@@ -1,19 +1,26 @@
 import { useEffect } from "react";
 
-/** International size chart — letter size + UK + US (simplified from standard conversion). */
-const CHART = [
-  { size: "XS", uk: "6 – 8", us: "2 – 4" },
-  { size: "S", uk: "10 – 12", us: "6 – 8" },
-  { size: "M", uk: "14 – 16", us: "10 – 12" },
-  { size: "L", uk: "18 – 20", us: "14 – 16" },
-  { size: "XL", uk: "22", us: "18" },
+/**
+ * Full conversion chart (Nigeria/UK · US · Europe EU).
+ * Matches common Nigerian retail sizing.
+ */
+const FULL_CHART = [
+  { ngUk: "6", us: "2", eu: "34" },
+  { ngUk: "8", us: "4", eu: "36" },
+  { ngUk: "10", us: "6", eu: "38" },
+  { ngUk: "12", us: "8", eu: "40" },
+  { ngUk: "14", us: "10", eu: "42" },
+  { ngUk: "16", us: "12", eu: "44" },
+  { ngUk: "18", us: "14", eu: "46" },
+  { ngUk: "20", us: "16", eu: "48" },
+  { ngUk: "22", us: "18", eu: "50" },
 ];
 
-/** How Shop with Dee sizes map to UK / US. */
+/** How Shop with Dee order sizes map. */
 const SHOP_SIZES = [
-  { size: "12", uk: "12", us: "8", approx: "S – M" },
-  { size: "13", uk: "13 – 14", us: "9 – 10", approx: "M" },
-  { size: "14", uk: "14", us: "10", approx: "M – L" },
+  { size: "12", ngUk: "12", us: "8", eu: "40" },
+  { size: "13", ngUk: "13 – 14", us: "9 – 10", eu: "41 – 42" },
+  { size: "14", ngUk: "14", us: "10", eu: "42" },
 ];
 
 export default function SizeGuide({ open, onClose }) {
@@ -60,7 +67,7 @@ export default function SizeGuide({ open, onClose }) {
         </div>
 
         <div className="p-5 space-y-6">
-          {/* Shop sizes (what customers pick on the site) */}
+          {/* Shop sizes */}
           <div>
             <p className="text-sm font-medium text-ink/70 mb-3">
               Our sizes (what you select when ordering)
@@ -70,9 +77,9 @@ export default function SizeGuide({ open, onClose }) {
                 <thead>
                   <tr className="bg-espresso-dark text-cream">
                     <th className="px-3 py-2.5 font-medium">Size</th>
-                    <th className="px-3 py-2.5 font-medium">UK</th>
+                    <th className="px-3 py-2.5 font-medium">Nigeria / UK</th>
                     <th className="px-3 py-2.5 font-medium">US</th>
-                    <th className="px-3 py-2.5 font-medium">Approx.</th>
+                    <th className="px-3 py-2.5 font-medium">Europe (EU)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -84,9 +91,11 @@ export default function SizeGuide({ open, onClose }) {
                       <td className="px-3 py-2.5 font-semibold text-ink">
                         {row.size}
                       </td>
-                      <td className="px-3 py-2.5 text-ink/80">{row.uk}</td>
+                      <td className="px-3 py-2.5 text-ink/80">{row.ngUk}</td>
                       <td className="px-3 py-2.5 text-ink/80">{row.us}</td>
-                      <td className="px-3 py-2.5 text-ink/60">{row.approx}</td>
+                      <td className="px-3 py-2.5 text-ink/80 font-medium">
+                        {row.eu}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -94,42 +103,54 @@ export default function SizeGuide({ open, onClose }) {
             </div>
           </div>
 
-          {/* International letter chart */}
+          {/* Full conversion chart */}
           <div>
             <p className="text-sm font-medium text-ink/70 mb-3">
-              International letter sizes
+              Full size conversion
             </p>
             <div className="overflow-x-auto rounded-xl border border-ink/10">
               <table className="w-full text-sm text-left">
                 <thead>
                   <tr className="bg-espresso-dark text-cream">
-                    <th className="px-3 py-2.5 font-medium">Size</th>
-                    <th className="px-3 py-2.5 font-medium">UK</th>
+                    <th className="px-3 py-2.5 font-medium">Nigeria / UK</th>
                     <th className="px-3 py-2.5 font-medium">US</th>
+                    <th className="px-3 py-2.5 font-medium">Europe (EU)</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {CHART.map((row, i) => (
+                  {FULL_CHART.map((row, i) => (
                     <tr
-                      key={row.size}
-                      className={i % 2 === 0 ? "bg-white" : "bg-cream"}
+                      key={row.ngUk}
+                      className={
+                        // Highlight the sizes we actually sell
+                        ["12", "14"].includes(row.ngUk)
+                          ? "bg-gold/15"
+                          : i % 2 === 0
+                            ? "bg-white"
+                            : "bg-cream"
+                      }
                     >
                       <td className="px-3 py-2.5 font-semibold text-ink">
-                        {row.size}
+                        {row.ngUk}
                       </td>
-                      <td className="px-3 py-2.5 text-ink/80">{row.uk}</td>
                       <td className="px-3 py-2.5 text-ink/80">{row.us}</td>
+                      <td className="px-3 py-2.5 text-ink/80 font-medium">
+                        {row.eu}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+            <p className="text-[11px] text-ink/40 mt-2">
+              Highlighted rows match sizes available on this site (12 & 14).
+            </p>
           </div>
 
           <p className="text-xs text-ink/45 leading-relaxed">
-            Sizes can vary slightly by style. If you&rsquo;re between sizes or
-            unsure, message us on WhatsApp with your usual size — we&rsquo;ll
-            help you pick the best fit.
+            If you usually wear European size 40, that is our size 12. Size 42 is
+            our size 14. Unsure? Message us on WhatsApp with the size you
+            normally wear — we&rsquo;ll help you choose.
           </p>
 
           <button
