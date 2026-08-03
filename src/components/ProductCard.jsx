@@ -4,9 +4,12 @@ export default function ProductCard({ product, onSelect }) {
 
   return (
     <article className="group relative bg-white rounded-2xl overflow-hidden shadow-[0_1px_2px_rgba(28,20,16,0.06)] border border-ink/5 flex flex-col">
-      <div
-        className="relative h-56 sm:h-64 flex items-center justify-center overflow-hidden"
+      <button
+        type="button"
+        onClick={() => onSelect(product)}
+        className="relative h-56 sm:h-64 flex items-center justify-center overflow-hidden w-full text-left cursor-pointer"
         style={{ backgroundColor: cover?.swatch }}
+        aria-label={`View designs for ${name}`}
       >
         {cover?.image ? (
           <img src={cover.image} alt={name} className="w-full h-full object-cover" />
@@ -26,10 +29,18 @@ export default function ProductCard({ product, onSelect }) {
             {designs.length} designs
           </span>
         )}
-      </div>
+      </button>
 
       <div className="p-5 flex flex-col gap-3 flex-1">
-        <h3 className="font-display text-lg text-ink leading-snug">{name}</h3>
+        <button
+          type="button"
+          onClick={() => onSelect(product)}
+          className="text-left"
+        >
+          <h3 className="font-display text-lg text-ink leading-snug hover:text-espresso-dark transition-colors">
+            {name}
+          </h3>
+        </button>
         <p className="text-gold font-semibold text-base mt-auto">
           &#8358;{price.toLocaleString()}
         </p>
