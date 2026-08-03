@@ -44,3 +44,35 @@ export function buildWhatsAppLink(product, options = {}) {
 
   return `${base}?text=${encodeURIComponent(message)}`;
 }
+
+/**
+ * Builds a WhatsApp link for a multi-item cart order.
+ * @param {Array} items - cart items from useCart()
+ */
+export function buildCartWhatsAppLink(items) {
+  const base = `https://wa.me/${siteConfig.whatsappNumber}`;
+
+  if (!items || items.length === 0) {
+    return `${base}?text=${encodeURIComponent(
+      "Hi Shop with Dee! I'd like to place an order."
+    )}`;
+  }
+
+  let message = "Hi Shop with Dee! I'd like to order the following:\n";
+  let grandTotal = 0;
+
+  items.forEach((item, index) => {
+    const lineTotal = item.price * item.quantity;
+    grandTotal += lineTotal;
+    message += `\n${index + 1}. ${item.name}`;
+    if (item.designName) message += `\n   Design: ${item.designName}`;
+    message += `\n   Size: ${item.size}`;
+    message += `\n   Qty: ${item.quantity}`;
+    message += `\n   ₦${item.price.toLocaleString()} each (₦${lineTotal.toLocaleString()})`;
+  });
+
+  message += `\n\nGrand total: ₦${grandTotal.toLocaleString()}`;
+  message += "\n\nAre these available?";
+
+  return `${base}?text=${encodeURIComponent(message)}`;
+}
