@@ -7,6 +7,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CartDrawer from "../components/CartDrawer";
 import SizeGuide from "../components/SizeGuide";
+import ProductReviews, { getProductRating } from "../components/ProductReviews";
+import { StarRating } from "../components/StarRating";
 
 const SIZES = ["12", "13", "14"];
 
@@ -66,9 +68,10 @@ export default function ProductPage() {
     );
   }
 
-  const { name, price, designs = [] } = product;
+  const { name, price, designs = [], reviews = [] } = product;
   const total = price * quantity;
   const canAdd = Boolean(selectedDesign);
+  const { rating, count } = getProductRating(product);
 
   function handleAddToCart() {
     if (!canAdd) return;
@@ -125,6 +128,11 @@ export default function ProductPage() {
             </h1>
             {selectedDesign?.name && (
               <p className="text-ink/50 text-sm mt-1">{selectedDesign.name}</p>
+            )}
+            {count > 0 && (
+              <div className="mt-2">
+                <StarRating rating={rating} count={count} size="md" />
+              </div>
             )}
             <p className="text-gold font-semibold text-xl mt-2">
               &#8358;{price.toLocaleString()}
@@ -285,6 +293,9 @@ export default function ProductPage() {
             >
               Order this one on WhatsApp
             </a>
+
+            {/* Reviews */}
+            <ProductReviews productId={product.id} initialReviews={reviews} />
           </div>
         </div>
       </main>
