@@ -11,7 +11,9 @@ export default function OrderModal({ product, onClose }) {
 
   // Reset the form whenever a new product is opened, and let Escape close it.
   useEffect(() => {
-    const designs = product?.designs;
+    if (!product) return;
+
+    const designs = product.designs;
     if (designs && designs.length > 1) {
       setStep("design");
       setSelectedDesign(null);
