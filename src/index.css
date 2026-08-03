@@ -67,46 +67,62 @@ button:focus-visible {
 .font-display { font-family: 'Playfair Display', serif; }
 .font-script { font-family: 'Cormorant Garamond', serif; font-style: italic; }
 
-/* ── PRE ORDER badge ─────────────────────────────────────────────────────── */
+/* ── PRE ORDER badge (hanging sign style) ───────────────────────────────── */
 .preorder-badge {
-  animation: preorder-float 2.8s ease-in-out infinite;
+  animation: preorder-float 2.6s ease-in-out infinite;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
 }
 
 .preorder-badge-inner {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
+  gap: 2px;
   background: #0a0a0a;
-  border: 2px solid #3b9eff;
-  border-radius: 6px;
-  padding: 8px 7px;
-  box-shadow: 0 4px 14px rgba(59, 158, 255, 0.35), 0 2px 6px rgba(0, 0, 0, 0.4);
-  animation: preorder-pulse 2.8s ease-in-out infinite;
+  border: 2.5px solid #3b9eff;
+  border-radius: 4px;
+  padding: 10px 8px 9px;
+  min-width: 52px;
+  animation: preorder-glow 2.6s ease-in-out infinite;
+}
+
+/* Small “tape” at the top like the reference pin */
+.preorder-badge-inner::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-8deg);
+  width: 18px;
+  height: 10px;
+  background: #3b9eff;
+  border-radius: 2px;
+  opacity: 0.9;
 }
 
 .preorder-text {
   color: #fff;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  line-height: 1.15;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  line-height: 1.1;
   text-transform: uppercase;
 }
 
 @keyframes preorder-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-5px) rotate(2deg); }
 }
 
-@keyframes preorder-pulse {
+@keyframes preorder-glow {
   0%, 100% {
-    box-shadow: 0 4px 14px rgba(59, 158, 255, 0.35), 0 2px 6px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 0 rgba(59, 158, 255, 0.35);
     border-color: #3b9eff;
   }
   50% {
-    box-shadow: 0 4px 20px rgba(59, 158, 255, 0.55), 0 2px 8px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 0 12px 2px rgba(59, 158, 255, 0.5);
     border-color: #6bb6ff;
   }
 }
