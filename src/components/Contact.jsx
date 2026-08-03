@@ -1,23 +1,30 @@
 import { useState } from "react";
 import { siteConfig, buildWhatsAppLink } from "../config";
-import { submitContactMessage } from "../firebase";
 
 const initialForm = { name: "", phone: "", message: "" };
 
+/** Builds a WhatsApp link with the contact form details pre-filled. */
+function buildContactWhatsAppLink({ name, phone, message }) {
+  const base = `https://wa.me/${siteConfig.whatsappNumber}`;
+  const text = [
+    "Hi Shop with Dee!",
+    "",
+    `Name: ${name}`,
+    `Phone: ${phone}`,
+    "",
+    message,
+  ].join("\n");
+  return `${base}?text=${encodeURIComponent(text)}`;
+}
+
 export default function Contact() {
   const [form, setForm] = useState(initialForm);
-  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
-    setStatus("sending");
-    const ok = await submitContactMessage(form);
-    if (ok) {
-      setStatus("sent");
-      setForm(initialForm);
-    } else {
-      setStatus("error");
-    }
+    const url = buildContactWhatsAppLink(form);
+    window.open(url, "_blank", "noopener,noreferrer");
+    setForm(initialForm);
   }
 
   return (
@@ -79,71 +86,59 @@ export default function Contact() {
             Prefer to leave a message?
           </h3>
           <p className="text-cream/50 text-sm mb-6">
-            We&rsquo;ll reply on WhatsApp or by phone within the day.
+            Fill in the form and we&rsquo;ll open WhatsApp with your message
+            ready to send.
           </p>
 
-          {status === "sent" ? (
-            <div className="text-gold-light bg-gold/10 border border-gold/30 rounded-xl p-5 text-sm">
-              Message received — thank you! We&rsquo;ll be in touch shortly.
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div>
+              <label htmlFor="name" className="sr-only">
+                Name
+              </label>
+              <input
+                id="name"
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Your name"
+                className="w-full rounded-lg bg-espresso-dark border border-gold/20 text-cream placeholder:text-cream/35 px-4 py-3 text-sm focus:border-gold/60 outline-none"
+              />
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div>
-                <label htmlFor="name" className="sr-only">
-                  Name
-                </label>
-                <input
-                  id="name"
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Your name"
-                  className="w-full rounded-lg bg-espresso-dark border border-gold/20 text-cream placeholder:text-cream/35 px-4 py-3 text-sm focus:border-gold/60 outline-none"
-                />
-              </div>
-              <div>
-                <label htmlFor="phone" className="sr-only">
-                  Phone number
-                </label>
-                <input
-                  id="phone"
-                  required
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="Phone number"
-                  className="w-full rounded-lg bg-espresso-dark border border-gold/20 text-cream placeholder:text-cream/35 px-4 py-3 text-sm focus:border-gold/60 outline-none"
-                />
-              </div>
-              <div>
-                <label htmlFor="message" className="sr-only">
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  required
-                  rows={4}
-                  value={form.message}
-                  onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  placeholder="Tell us what you're looking for"
-                  className="w-full rounded-lg bg-espresso-dark border border-gold/20 text-cream placeholder:text-cream/35 px-4 py-3 text-sm focus:border-gold/60 outline-none resize-none"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={status === "sending"}
-                className="rounded-full bg-gold text-espresso-dark py-3 font-medium hover:bg-gold-light transition-colors disabled:opacity-60"
-              >
-                {status === "sending" ? "Sending…" : "Send message"}
-              </button>
-              {status === "error" && (
-                <p className="text-berry text-sm">
-                  Firebase isn&rsquo;t connected yet — message us on WhatsApp
-                  instead, or add your Firebase keys to .env.
-                </p>
-              )}
-            </form>
-          )}
+            <div>
+              <label htmlFor="phone" className="sr-only">
+                Phone number
+              </label>
+              <input
+                id="phone"
+                required
+                type="tel"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder="Phone number"
+                className="w-full rounded-lg bg-espresso-dark border border-gold/20 text-cream placeholder:text-cream/35 px-4 py-3 text-sm focus:border-gold/60 outline-none"
+              />
+            </div>
+            <div>
+              <label htmlFor="message" className="sr-only">
+                Message
+              </label>
+              <textarea
+                id="message"
+                required
+                rows={4}
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                placeholder="Tell us what you're looking for"
+                className="w-full rounded-lg bg-espresso-dark border border-gold/20 text-cream placeholder:text-cream/35 px-4 py-3 text-sm focus:border-gold/60 outline-none resize-none"
+              />
+            </div>
+            <button
+              type="submit"
+              className="rounded-full bg-gold text-espresso-dark py-3 font-medium hover:bg-gold-light transition-colors"
+            >
+              Send on WhatsApp
+            </button>
+          </form>
         </div>
       </div>
     </section>
