@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo-lit.jpg";
-import { siteConfig, buildWhatsAppLink } from "../config";
+import { buildWhatsAppLink } from "../config";
 import { useCart } from "../cart";
 
 const NAV_LINKS = [
-  { label: "Collection", href: "#collection" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "Collection", href: "/#collection" },
+  { label: "About", href: "/#about" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { totalItems, openCart } = useCart();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -21,16 +24,19 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // On product pages, always use the solid header background
+  const solid = scrolled || !isHome;
+
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-colors duration-300 ${
-        scrolled
+        solid
           ? "bg-espresso-dark/95 backdrop-blur shadow-[0_1px_0_rgba(199,153,46,0.25)]"
           : "bg-transparent"
       }`}
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between px-5 sm:px-8 h-20">
-        <a href="#top" className="flex items-center gap-3 shrink-0">
+        <Link to="/" className="flex items-center gap-3 shrink-0">
           <img
             src={logo}
             alt="Shop with Dee"
@@ -39,7 +45,7 @@ export default function Header() {
           <span className="font-display text-lg sm:text-xl text-cream tracking-wide">
             Shop with Dee
           </span>
-        </a>
+        </Link>
 
         <nav className="hidden md:flex items-center gap-9">
           {NAV_LINKS.map((link) => (
@@ -54,7 +60,6 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          {/* Cart button */}
           <button
             type="button"
             onClick={openCart}
