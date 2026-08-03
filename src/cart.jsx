@@ -1,10 +1,35 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const CartContext = createContext(null);
+const STORAGE_KEY = "shop-with-dee-cart";
+
+function loadCart() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCart(items) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    // Quota exceeded or private mode — cart still works for this session
+  }
+}
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(loadCart);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Keep localStorage in sync whenever the cart changes
+  useEffect(() => {
+    saveCart(items);
+  }, [items]);
 
   function addItem({ product, design, size, quantity }) {
     const key = `${product.id}__${design?.id ?? "default"}__${size}`;
@@ -26,7 +51,7 @@ export function CartProvider({ children }) {
           price: product.price,
           designId: design?.id,
           designName: design?.name,
-          image: design?.image,
+          image: design?.image ?? null,
           size,
           quantity,
         },
@@ -48,6 +73,11 @@ export function CartProvider({ children }) {
 
   function clearCart() {
     setItems([]);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore
+    }
   }
 
   const totalItems = useMemo(
