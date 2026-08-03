@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
-import OrderModal from "./OrderModal";
 import { products as fallbackProducts } from "../data/products";
 import { fetchProducts } from "../firebase";
 
 export default function Products() {
   const [products, setProducts] = useState(fallbackProducts);
-  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,16 +34,10 @@ export default function Products() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onSelect={setSelected}
-            />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </div>
-
-      <OrderModal product={selected} onClose={() => setSelected(null)} />
     </section>
   );
 }
