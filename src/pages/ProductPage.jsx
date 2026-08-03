@@ -6,6 +6,7 @@ import { useCart } from "../cart";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CartDrawer from "../components/CartDrawer";
+import SizeGuide from "../components/SizeGuide";
 
 const SIZES = ["12", "13", "14"];
 
@@ -21,6 +22,7 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [lightbox, setLightbox] = useState(null);
   const [justAdded, setJustAdded] = useState(false);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -34,6 +36,7 @@ export default function ProductPage() {
     setQuantity(1);
     setLightbox(null);
     setJustAdded(false);
+    setSizeGuideOpen(false);
   }, [product]);
 
   useEffect(() => {
@@ -75,7 +78,6 @@ export default function ProductPage() {
   }
 
   function goBack() {
-    // Prefer browser history so swipe-back / back button feel natural
     if (window.history.length > 1) {
       navigate(-1);
     } else {
@@ -89,7 +91,6 @@ export default function ProductPage() {
 
       <main className="flex-1 pt-20 pb-16">
         <div className="max-w-3xl mx-auto px-5 sm:px-8">
-          {/* Back button — always visible */}
           <button
             type="button"
             onClick={goBack}
@@ -99,7 +100,6 @@ export default function ProductPage() {
             Back to collection
           </button>
 
-          {/* Main image */}
           <button
             type="button"
             onClick={() => selectedDesign && setLightbox(selectedDesign)}
@@ -191,7 +191,16 @@ export default function ProductPage() {
 
             {/* Size */}
             <div className="mt-8">
-              <p className="text-sm font-medium text-ink/70 mb-2">Size</p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-medium text-ink/70">Size</p>
+                <button
+                  type="button"
+                  onClick={() => setSizeGuideOpen(true)}
+                  className="text-sm text-gold hover:text-espresso-dark font-medium underline underline-offset-2"
+                >
+                  Check size measurements
+                </button>
+              </div>
               <div className="flex gap-2">
                 {SIZES.map((s) => (
                   <button
@@ -282,8 +291,8 @@ export default function ProductPage() {
 
       <Footer />
       <CartDrawer />
+      <SizeGuide open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} />
 
-      {/* Lightbox */}
       {lightbox && (
         <div
           className="fixed inset-0 z-[110] flex items-center justify-center bg-ink/90 backdrop-blur-sm p-4"
