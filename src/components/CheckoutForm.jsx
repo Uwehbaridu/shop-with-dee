@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { buildCartWhatsAppLink } from "../config";
 import { useCart } from "../cart";
+import { sendOrderEmails, isEmailConfigured } from "../email";
 
 const NIGERIAN_STATES = [
   "Abia",
@@ -44,6 +45,7 @@ const NIGERIAN_STATES = [
 
 const initial = {
   name: "",
+  email: "",
   phone: "",
   isWhatsApp: true,
   state: "",
@@ -54,6 +56,8 @@ const initial = {
 export default function CheckoutForm({ onClose }) {
   const { items, totalPrice, clearCart, closeCart } = useCart();
   const [form, setForm] = useState(initial);
+  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState(null); // null | 'ok' | 'email-failed'
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
@@ -63,20 +67,50 @@ export default function CheckoutForm({ onClose }) {
     }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const url = buildCartWhatsAppLink(items, {
+    setSubmitting(true);
+    setStatus(null);
+
+    const customer = {
       customerName: form.name.trim(),
+      email: form.email.trim(),
       phone: form.phone.trim(),
       isWhatsApp: form.isWhatsApp,
       state: form.state,
       city: form.city.trim(),
       address: form.address.trim(),
+    };
+
+    const emailResult = await sendOrderEmails({
+      items,
+      customer,
+      totalPrice,
     });
+
+    const url = buildCartWhatsAppLink(items, {
+      ...customer,
+      orderId: emailResult.orderId,
+    });
+
     window.open(url, "_blank", "noopener,noreferrer");
+
+    if (emailResult.ok) {
+      setStatus("ok");
+    } else if (emailResult.skipped) {
+      setStatus("skipped");
+    } else {
+      setStatus("email-failed");
+    }
+
     clearCart();
-    closeCart();
-    onClose();
+    setSubmitting(false);
+
+    // Brief pause so customer sees confirmation, then close
+    setTimeout(() => {
+      closeCart();
+      onClose();
+    }, 1800);
   }
 
   return (
@@ -147,6 +181,26 @@ export default function CheckoutForm({ onClose }) {
               placeholder="Your full name"
               className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/35 focus:border-gold outline-none"
             />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label htmlFor="co-email" className="block text-sm font-medium text-ink/70 mb-1.5">
+              Email address
+            </label>
+            <input
+              id="co-email"
+              name="email"
+              type="email"
+              required
+              value={form.email}
+              onChange={handleChange}
+              placeholder="you@example.com"
+              className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/35 focus:border-gold outline-none"
+            />
+            <p className="mt-1.5 text-xs text-ink/40">
+              We’ll send your order confirmation here.
+            </p>
           </div>
 
           {/* Phone */}
@@ -235,18 +289,35 @@ export default function CheckoutForm({ onClose }) {
             </div>
           </div>
 
-          {/* Delivery note */}
           <div className="rounded-xl bg-gold/10 border border-gold/25 px-4 py-3 text-sm text-espresso-dark/80">
             <strong className="font-medium">Note:</strong> Delivery fee will be
             paid by you. We’ll confirm the delivery cost on WhatsApp after your
-            order.
+            order. You’ll also get a confirmation email.
           </div>
+
+          {status === "ok" && (
+            <p className="text-sm text-center text-espresso-dark bg-gold/15 rounded-xl px-4 py-3">
+              Order received — confirmation email sent. Opening WhatsApp…
+            </p>
+          )}
+          {status === "email-failed" && (
+            <p className="text-sm text-center text-ink/70 bg-white border border-ink/10 rounded-xl px-4 py-3">
+              WhatsApp opened. If you don’t get an email, we’ll still follow up
+              on WhatsApp.
+            </p>
+          )}
+          {status === "skipped" && !isEmailConfigured() && (
+            <p className="text-sm text-center text-ink/70 bg-white border border-ink/10 rounded-xl px-4 py-3">
+              Opening WhatsApp to complete your order…
+            </p>
+          )}
 
           <button
             type="submit"
-            className="w-full rounded-full bg-gold text-espresso-dark py-3.5 font-medium hover:bg-gold-light transition-colors"
+            disabled={submitting}
+            className="w-full rounded-full bg-gold text-espresso-dark py-3.5 font-medium hover:bg-gold-light transition-colors disabled:opacity-60"
           >
-            Place order on WhatsApp
+            {submitting ? "Placing order…" : "Place order"}
           </button>
         </form>
       </div>
