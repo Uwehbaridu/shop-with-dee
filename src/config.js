@@ -5,17 +5,16 @@ export const siteConfig = {
   tagline: "The fashion hub — luxury for less",
   subtagline: "Classic never goes out of fashion.",
   whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || "2349126783004", // no + or spaces
+  orderEmail: import.meta.env.VITE_ORDER_EMAIL || "shopwithdee07@gmail.com",
   callNumber: "+234 810 993 3872",
   callNumberHref: "+2348109933872",
-  instagramHandle: "@shopwithdee", // update to the real handle
+  instagramHandle: "@shopwithdee",
   instagramUrl: "https://instagram.com/shopwithdee",
   location: "Port Harcourt, Rivers State, Nigeria",
 };
 
 /**
  * Builds a wa.me link that opens WhatsApp with a pre-filled order message.
- * If a product is passed, the message names it, its design, size, quantity,
- * and price so Dee's team can confirm the order without back-and-forth.
  */
 export function buildWhatsAppLink(product, options = {}) {
   const base = `https://wa.me/${siteConfig.whatsappNumber}`;
@@ -40,11 +39,7 @@ export function buildWhatsAppLink(product, options = {}) {
 }
 
 /**
- * Builds a WhatsApp link for a multi-item cart order, optionally with
- * customer and delivery details from the checkout form.
- *
- * @param {Array} items - cart items from useCart()
- * @param {object} [customer]
+ * Builds a WhatsApp link for a multi-item cart order with customer details.
  */
 export function buildCartWhatsAppLink(items, customer = {}) {
   const base = `https://wa.me/${siteConfig.whatsappNumber}`;
@@ -57,8 +52,14 @@ export function buildCartWhatsAppLink(items, customer = {}) {
 
   let message = "Hi Shop with Dee! I'd like to place a pre-order.\n";
 
+  if (customer.orderId) {
+    message += `\nOrder ID: ${customer.orderId}`;
+  }
   if (customer.customerName) {
     message += `\nName: ${customer.customerName}`;
+  }
+  if (customer.email) {
+    message += `\nEmail: ${customer.email}`;
   }
   if (customer.phone) {
     message += `\nPhone: ${customer.phone}`;
