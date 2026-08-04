@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./cart";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
+import FeaturedProducts from "./components/FeaturedProducts";
 import Products from "./components/Products";
 import About from "./components/About";
 import Showroom from "./components/Showroom";
@@ -16,6 +17,7 @@ function HomePage() {
       <Header />
       <main>
         <Hero />
+        <FeaturedProducts />
         <Products />
         <About />
         <Showroom />
