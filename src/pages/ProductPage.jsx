@@ -23,6 +23,7 @@ export default function ProductPage() {
   const [size, setSize] = useState(SIZES[0]);
   const [quantity, setQuantity] = useState(1);
   const [lightbox, setLightbox] = useState(null);
+  const [showVideo, setShowVideo] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
 
@@ -37,17 +38,20 @@ export default function ProductPage() {
     setSize(SIZES[0]);
     setQuantity(1);
     setLightbox(null);
+    setShowVideo(false);
     setJustAdded(false);
     setSizeGuideOpen(false);
   }, [product]);
 
   useEffect(() => {
     function onKeyDown(e) {
-      if (e.key === "Escape" && lightbox) setLightbox(null);
+      if (e.key !== "Escape") return;
+      if (showVideo) setShowVideo(false);
+      else if (lightbox) setLightbox(null);
     }
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [lightbox]);
+  }, [lightbox, showVideo]);
 
   if (!product) {
     return (
@@ -68,7 +72,7 @@ export default function ProductPage() {
     );
   }
 
-  const { name, price, designs = [], reviews = [] } = product;
+  const { name, price, designs = [], reviews = [], video } = product;
   const total = price * quantity;
   const canAdd = Boolean(selectedDesign);
   const { rating, count } = getProductRating(product);
@@ -138,7 +142,7 @@ export default function ProductPage() {
               &#8358;{price.toLocaleString()}
             </p>
 
-            {/* Designs */}
+            {/* Designs + optional video tile */}
             <div className="mt-8">
               <p className="text-sm font-medium text-ink/70 mb-3">Choose a design</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -194,6 +198,33 @@ export default function ProductPage() {
                     </div>
                   );
                 })}
+
+                {/* Video tile — same grid cell as a design */}
+                {video && (
+                  <div className="flex flex-col gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setShowVideo(true)}
+                      className="relative rounded-xl overflow-hidden border-2 border-ink/10 hover:border-gold/50 transition-all aspect-square bg-espresso-dark flex flex-col items-center justify-center gap-2 group"
+                      aria-label="Watch product video"
+                    >
+                      <span className="w-12 h-12 rounded-full bg-gold/90 text-espresso-dark flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className="w-6 h-6 ml-0.5"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </span>
+                      <span className="text-[11px] text-cream/80 font-medium">
+                        Watch video
+                      </span>
+                    </button>
+                    <span className="text-xs text-ink/60 px-0.5">How it looks</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -294,7 +325,6 @@ export default function ProductPage() {
               Order this one on WhatsApp
             </a>
 
-            {/* Reviews */}
             <ProductReviews productId={product.id} initialReviews={reviews} />
           </div>
         </div>
@@ -304,6 +334,7 @@ export default function ProductPage() {
       <CartDrawer />
       <SizeGuide open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} />
 
+      {/* Image lightbox */}
       {lightbox && (
         <div
           className="fixed inset-0 z-[110] flex items-center justify-center bg-ink/90 backdrop-blur-sm p-4"
@@ -340,6 +371,38 @@ export default function ProductPage() {
             <p className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-ink/80 to-transparent text-cream text-center py-4 text-sm">
               {lightbox.name}
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Video modal */}
+      {showVideo && video && (
+        <div
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-ink/90 backdrop-blur-sm p-4"
+          onClick={() => setShowVideo(false)}
+          role="presentation"
+        >
+          <button
+            onClick={() => setShowVideo(false)}
+            aria-label="Close video"
+            className="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center z-10"
+          >
+            &#10005;
+          </button>
+          <div
+            className="relative w-full max-w-md rounded-2xl overflow-hidden shadow-2xl bg-ink"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <video
+              src={video}
+              controls
+              autoPlay
+              playsInline
+              className="w-full max-h-[80vh] object-contain"
+            >
+              Your browser does not support the video tag.
+            </video>
+            <p className="text-cream/80 text-sm text-center py-3 px-4">{name}</p>
           </div>
         </div>
       )}
