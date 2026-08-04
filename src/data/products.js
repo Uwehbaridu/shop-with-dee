@@ -1,10 +1,12 @@
 // Product catalogue for Shop with Dee.
 // Each product = one folder under src/assets/products/.
 // Each design = one image inside that folder (named by colour / description).
+// Optional video = folder-named .mp4 inside the same folder.
 
 // ── Asymmetric Striped Lapel Midi Dress ───────────────────────────────────
 import asymmetricDeepPlum from "../assets/products/Asymmetric Striped Lapel Midi Dress/Deep Plum _ Eggplant Purple.jpg";
 import asymmetricDustyPink from "../assets/products/Asymmetric Striped Lapel Midi Dress/Dusty Pink _ Rose Pink.jpg";
+import asymmetricVideo from "../assets/products/Asymmetric Striped Lapel Midi Dress/Asymmetric Striped Lapel Midi Dress.mp4";
 
 // ── Button-Accent Three-Quarter Sleeve Pencil Dress ───────────────────────
 import buttonBrightRed from "../assets/products/Button-Accent Three-Quarter Sleeve Pencil Dress/Bright Red.jpg";
@@ -14,6 +16,13 @@ import buttonBlackNavy from "../assets/products/Button-Accent Three-Quarter Slee
 import highNeckBlack from "../assets/products/Classic High-Neck short-Sleeve Bodycon Dress/Classic Black.jpg";
 import highNeckTeal from "../assets/products/Classic High-Neck short-Sleeve Bodycon Dress/Teal _ Blue.jpg";
 import highNeckWine from "../assets/products/Classic High-Neck short-Sleeve Bodycon Dress/Wine Red _ Burgundy.jpg";
+import highNeckVideo from "../assets/products/Classic High-Neck short-Sleeve Bodycon Dress/Classic High-Neck short-Sleeve Bodycon Dress.mp4";
+
+// ── Geometric Trim Color-Block Midi Dress (new) ───────────────────────────
+import geometricBlackBeige from "../assets/products/Geometric Trim Color-Block Midi Dress/Black with Beige _ Cream Panels.jpg";
+import geometricBlackTeal from "../assets/products/Geometric Trim Color-Block Midi Dress/Black with Teal Green Panels.jpg";
+import geometricPurpleNavy from "../assets/products/Geometric Trim Color-Block Midi Dress/Deep Purple _ Navy with Dark Contrast Panels.jpg";
+import geometricVideo from "../assets/products/Geometric Trim Color-Block Midi Dress/Geometric Trim Color-Block Midi Dress.mp4";
 
 // ── Prestige Collection ───────────────────────────────────────────────────
 import prestigeBlackBlue from "../assets/products/Prestige Collection/Black with Blue Buttons – Size_ 12–14.jpg";
@@ -21,12 +30,29 @@ import prestigeBlackWhite from "../assets/products/Prestige Collection/Black wit
 import prestigeMustard from "../assets/products/Prestige Collection/Mustard_Gold – Size_ 12–14.jpg";
 import prestigePink from "../assets/products/Prestige Collection/Pink – Size_ 12–14.jpg";
 import prestigePlum from "../assets/products/Prestige Collection/Plum_Purple with White Buttons – Size_ 12–14.jpg";
+import prestigeVideo from "../assets/products/Prestige Collection/Prestige Collection.mp4";
+
+// ── Side-Draped Peplum Short-Sleeve Midi Dress (new) ──────────────────────
+import peplumBlue from "../assets/products/Side-Draped Peplum Short-Sleeve Midi Dress/Blue.jpg";
+import peplumRed from "../assets/products/Side-Draped Peplum Short-Sleeve Midi Dress/Bright Red.jpg";
+import peplumTeal from "../assets/products/Side-Draped Peplum Short-Sleeve Midi Dress/Deep Teal _ Emerald Green.jpg";
+import peplumFuchsia from "../assets/products/Side-Draped Peplum Short-Sleeve Midi Dress/Fuchsia Pink _ Magenta.jpg";
+import peplumMustard from "../assets/products/Side-Draped Peplum Short-Sleeve Midi Dress/Mustard Yellow.jpg";
+import peplumOlive from "../assets/products/Side-Draped Peplum Short-Sleeve Midi Dress/Olive Green.jpg";
+import peplumPeach from "../assets/products/Side-Draped Peplum Short-Sleeve Midi Dress/Peach _ Coral.jpg";
+import peplumVideo from "../assets/products/Side-Draped Peplum Short-Sleeve Midi Dress/Side-Draped Peplum Short-Sleeve Midi Dress.mp4";
 
 // ── The Emerald Dress ─────────────────────────────────────────────────────
 import emeraldBlack from "../assets/products/The Emerald Dress/Black – Size_ 12–14.jpg";
 import emeraldMagenta from "../assets/products/The Emerald Dress/Magenta – Size_ 12–14.jpg";
 import emeraldTeal from "../assets/products/The Emerald Dress/Teal – Size_ 12–14.jpg";
 import emeraldWine from "../assets/products/The Emerald Dress/Wine – Size_ 12–14.jpg";
+import emeraldVideo from "../assets/products/The Emerald Dress/Emerald Dress.mp4";
+
+// ── The Harmony Dress (new) ───────────────────────────────────────────────
+import harmonyBlack from "../assets/products/The Harmony Dress – Emerald Green & Nude – Size_ 12–14/Classic Black.jpg";
+import harmonyEmerald from "../assets/products/The Harmony Dress – Emerald Green & Nude – Size_ 12–14/Emerald Green.jpg";
+import harmonyVideo from "../assets/products/The Harmony Dress – Emerald Green & Nude – Size_ 12–14/The Harmony Dress – Emerald Green & Nude.mp4";
 
 // ── The Monarch Dress ─────────────────────────────────────────────────────
 import monarchBlack from "../assets/products/The Monarch Dress/Black – Size_ 12–14.jpg";
@@ -41,6 +67,7 @@ import victoriaFloral from "../assets/products/The Victoria Dress/Floral Print �
 import victoriaPeach from "../assets/products/The Victoria Dress/Peach – Size_ 12–14.jpg";
 import victoriaRed from "../assets/products/The Victoria Dress/Red – Size_ 12–14.jpg";
 import victoriaWhiteFloral from "../assets/products/The Victoria Dress/White Floral Print – Size_ 12–14.jpg";
+import victoriaVideo from "../assets/products/The Victoria Dress/The Victoria Dress.mp4";
 
 // ── The Vogue Dress ───────────────────────────────────────────────────────
 import vogueBlackOrange from "../assets/products/The Vogue Dress/Black and Orange_.jpg";
@@ -50,6 +77,7 @@ import voguePink from "../assets/products/The Vogue Dress/Pink – Size_ 12–14
 // ── The Zara Dress ────────────────────────────────────────────────────────
 import zaraBlack from "../assets/products/The Zara Dress/Black_.jpg";
 import zaraNavy from "../assets/products/The Zara Dress/Navy Blue_.jpg";
+import zaraVideo from "../assets/products/The Zara Dress/The Zara Dress.mp4";
 
 export const products = [
   {
@@ -57,6 +85,7 @@ export const products = [
     name: "Asymmetric Striped Lapel Midi Dress",
     price: 9500,
     tag: "New in",
+    video: asymmetricVideo,
     designs: [
       { id: "d1", name: "Deep Plum / Eggplant Purple", image: asymmetricDeepPlum },
       { id: "d2", name: "Dusty Pink / Rose Pink", image: asymmetricDustyPink },
@@ -84,6 +113,7 @@ export const products = [
     id: "classic-high-neck-bodycon",
     name: "Classic High-Neck Short-Sleeve Bodycon Dress",
     price: 9500,
+    video: highNeckVideo,
     designs: [
       { id: "d1", name: "Classic Black", image: highNeckBlack },
       { id: "d2", name: "Teal / Blue", image: highNeckTeal },
@@ -95,10 +125,24 @@ export const products = [
     ],
   },
   {
+    id: "geometric-trim-color-block",
+    name: "Geometric Trim Color-Block Midi Dress",
+    price: 9500,
+    tag: "New in",
+    video: geometricVideo,
+    designs: [
+      { id: "d1", name: "Black with Beige / Cream Panels", image: geometricBlackBeige },
+      { id: "d2", name: "Black with Teal Green Panels", image: geometricBlackTeal },
+      { id: "d3", name: "Deep Purple / Navy with Dark Contrast", image: geometricPurpleNavy },
+    ],
+    reviews: [],
+  },
+  {
     id: "prestige-collection",
     name: "Prestige Collection",
     price: 10000,
     tag: "Bestseller",
+    video: prestigeVideo,
     designs: [
       { id: "d1", name: "Black with Blue Buttons", image: prestigeBlackBlue },
       { id: "d2", name: "Black with White Buttons", image: prestigeBlackWhite },
@@ -114,9 +158,27 @@ export const products = [
     ],
   },
   {
+    id: "side-draped-peplum-midi",
+    name: "Side-Draped Peplum Short-Sleeve Midi Dress",
+    price: 9500,
+    tag: "New in",
+    video: peplumVideo,
+    designs: [
+      { id: "d1", name: "Blue", image: peplumBlue },
+      { id: "d2", name: "Bright Red", image: peplumRed },
+      { id: "d3", name: "Deep Teal / Emerald Green", image: peplumTeal },
+      { id: "d4", name: "Fuchsia Pink / Magenta", image: peplumFuchsia },
+      { id: "d5", name: "Mustard Yellow", image: peplumMustard },
+      { id: "d6", name: "Olive Green", image: peplumOlive },
+      { id: "d7", name: "Peach / Coral", image: peplumPeach },
+    ],
+    reviews: [],
+  },
+  {
     id: "the-emerald-dress",
     name: "The Emerald Dress",
     price: 9500,
+    video: emeraldVideo,
     designs: [
       { id: "d1", name: "Black", image: emeraldBlack },
       { id: "d2", name: "Magenta", image: emeraldMagenta },
@@ -127,6 +189,18 @@ export const products = [
       { id: "r1", name: "Chioma N.", rating: 5, comment: "Magenta is bold and beautiful. Fabric doesn’t wrinkle easily.", date: "2026-06-08" },
       { id: "r2", name: "Esther P.", rating: 4, comment: "Nice cut. Teal looks even better in person.", date: "2026-07-14" },
     ],
+  },
+  {
+    id: "the-harmony-dress",
+    name: "The Harmony Dress",
+    price: 9500,
+    tag: "New in",
+    video: harmonyVideo,
+    designs: [
+      { id: "d1", name: "Classic Black", image: harmonyBlack },
+      { id: "d2", name: "Emerald Green", image: harmonyEmerald },
+    ],
+    reviews: [],
   },
   {
     id: "the-monarch-dress",
@@ -148,6 +222,7 @@ export const products = [
     name: "The Victoria Dress",
     price: 9800,
     tag: "New in",
+    video: victoriaVideo,
     designs: [
       { id: "d1", name: "Black", image: victoriaBlack1 },
       { id: "d2", name: "Black (Alt)", image: victoriaBlack2 },
@@ -181,6 +256,7 @@ export const products = [
     id: "the-zara-dress",
     name: "The Zara Dress",
     price: 9500,
+    video: zaraVideo,
     designs: [
       { id: "d1", name: "Black", image: zaraBlack },
       { id: "d2", name: "Navy Blue", image: zaraNavy },
