@@ -33,8 +33,6 @@ function orderId() {
  * Sends two emails via EmailJS:
  * 1. Full order details → shop (shopwithdee07@gmail.com)
  * 2. Confirmation → customer
- *
- * Returns { ok, orderId, error? }
  */
 export async function sendOrderEmails({ items, customer, totalPrice }) {
   const id = orderId();
@@ -42,7 +40,24 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
   const address = [customer.address, customer.city, customer.state]
     .filter(Boolean)
     .join(", ");
+  const total = `₦${Number(totalPrice || 0).toLocaleString()}`;
 
+  const messageBody = [
+    `Order ID: ${id}`,
+    `Name: ${customer.customerName || ""}`,
+    `Email: ${customer.email || ""}`,
+    `Phone: ${customer.phone || ""}${customer.isWhatsApp ? " (WhatsApp)" : ""}`,
+    `Delivery: ${address}`,
+    "",
+    "Items:",
+    itemsText,
+    "",
+    `Total: ${total}`,
+    "",
+    "Note: Delivery fee to be confirmed with customer.",
+  ].join("\n");
+
+  // Custom vars + aliases for default Contact Us / Order Confirmation templates
   const base = {
     order_id: id,
     customer_name: customer.customerName || "",
@@ -51,9 +66,15 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
     is_whatsapp: customer.isWhatsApp ? "Yes" : "No",
     delivery_address: address,
     items_list: itemsText,
-    grand_total: `₦${Number(totalPrice || 0).toLocaleString()}`,
+    grand_total: total,
     shop_email: shopOrderEmail,
     brand: siteConfig.brand,
+    // Common EmailJS defaults
+    name: customer.customerName || "",
+    email: customer.email || "",
+    phone: customer.phone || "",
+    title: `Order ${id}`,
+    message: messageBody,
   };
 
   if (!isEmailConfigured()) {
@@ -64,7 +85,6 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
   }
 
   try {
-    // 1) Notify the shop
     await emailjs.send(
       SERVICE_ID,
       TEMPLATE_SHOP,
@@ -76,7 +96,6 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
       PUBLIC_KEY
     );
 
-    // 2) Confirm to the customer
     await emailjs.send(
       SERVICE_ID,
       TEMPLATE_CUSTOMER,
