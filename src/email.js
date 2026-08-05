@@ -42,6 +42,23 @@ function formatItemsHtml(items) {
     .join("");
 }
 
+function shopItemsTableRows(items) {
+  return items
+    .map((item, i) => {
+      const line = item.price * item.quantity;
+      return `<tr>
+        <td style="padding:10px 12px;border:1px solid #e5e5e5;font-size:13px;">${i + 1}</td>
+        <td style="padding:10px 12px;border:1px solid #e5e5e5;font-size:13px;">${item.name}</td>
+        <td style="padding:10px 12px;border:1px solid #e5e5e5;font-size:13px;">${item.designName || "—"}</td>
+        <td style="padding:10px 12px;border:1px solid #e5e5e5;font-size:13px;text-align:center;">${item.size}</td>
+        <td style="padding:10px 12px;border:1px solid #e5e5e5;font-size:13px;text-align:center;">${item.quantity}</td>
+        <td style="padding:10px 12px;border:1px solid #e5e5e5;font-size:13px;text-align:right;">₦${item.price.toLocaleString()}</td>
+        <td style="padding:10px 12px;border:1px solid #e5e5e5;font-size:13px;text-align:right;font-weight:600;">₦${line.toLocaleString()}</td>
+      </tr>`;
+    })
+    .join("");
+}
+
 function orderId() {
   const n = Date.now().toString().slice(-6);
   return `SWD-${n}`;
@@ -91,28 +108,74 @@ function customerEmailHtml({ id, name, itemsHtml, total }) {
 </div>`;
 }
 
-function shopEmailText({ id, customer, address, itemsText, total }) {
-  return [
-    `New order from the website`,
-    ``,
-    `Order ID: ${id}`,
-    `Name: ${customer.customerName || ""}`,
-    `Email: ${customer.email || ""}`,
-    `Phone: ${customer.phone || ""}${customer.isWhatsApp ? " (WhatsApp)" : ""}`,
-    `Delivery: ${address}`,
-    ``,
-    `Items:`,
-    itemsText,
-    ``,
-    `Total: ${total}`,
-    ``,
-    `Note: Confirm availability and delivery fee with the customer on WhatsApp.`,
-  ].join("\n");
+function shopEmailHtml({ id, customer, address, items, total }) {
+  const rows = shopItemsTableRows(items);
+  const whatsapp = customer.isWhatsApp ? "Yes" : "No";
+  return `
+<div style="font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:0 auto;color:#1C1410;line-height:1.5;">
+  <div style="background:#180F0A;padding:20px 24px;">
+    <p style="margin:0;font-size:11px;letter-spacing:0.2em;color:#E4C878;text-transform:uppercase;">Shop with Dee</p>
+    <h1 style="margin:8px 0 0;font-size:20px;color:#F8F3E9;font-weight:600;">A New Order Tracked</h1>
+    <p style="margin:6px 0 0;color:#E4C878;font-size:14px;">Order Number: <strong>${id}</strong></p>
+  </div>
+
+  <div style="padding:24px;">
+    <h2 style="margin:0 0 12px;font-size:15px;color:#333;text-transform:uppercase;letter-spacing:0.04em;">Customer details</h2>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:24px;font-size:14px;">
+      <tr>
+        <td style="padding:8px 12px;border:1px solid #e5e5e5;background:#f8f3e9;width:140px;"><strong>Name</strong></td>
+        <td style="padding:8px 12px;border:1px solid #e5e5e5;">${customer.customerName || "—"}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;border:1px solid #e5e5e5;background:#f8f3e9;"><strong>Email</strong></td>
+        <td style="padding:8px 12px;border:1px solid #e5e5e5;">${customer.email || "—"}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;border:1px solid #e5e5e5;background:#f8f3e9;"><strong>Phone</strong></td>
+        <td style="padding:8px 12px;border:1px solid #e5e5e5;">${customer.phone || "—"}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;border:1px solid #e5e5e5;background:#f8f3e9;"><strong>WhatsApp?</strong></td>
+        <td style="padding:8px 12px;border:1px solid #e5e5e5;">${whatsapp}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;border:1px solid #e5e5e5;background:#f8f3e9;"><strong>Delivery</strong></td>
+        <td style="padding:8px 12px;border:1px solid #e5e5e5;">${address || "—"}</td>
+      </tr>
+    </table>
+
+    <h2 style="margin:0 0 12px;font-size:15px;color:#333;text-transform:uppercase;letter-spacing:0.04em;">Order items</h2>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px;">
+      <thead>
+        <tr style="background:#180F0A;color:#F8F3E9;">
+          <th style="padding:10px 12px;border:1px solid #180F0A;text-align:left;">#</th>
+          <th style="padding:10px 12px;border:1px solid #180F0A;text-align:left;">Product</th>
+          <th style="padding:10px 12px;border:1px solid #180F0A;text-align:left;">Design</th>
+          <th style="padding:10px 12px;border:1px solid #180F0A;text-align:center;">Size</th>
+          <th style="padding:10px 12px;border:1px solid #180F0A;text-align:center;">Qty</th>
+          <th style="padding:10px 12px;border:1px solid #180F0A;text-align:right;">Unit</th>
+          <th style="padding:10px 12px;border:1px solid #180F0A;text-align:right;">Line</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+
+    <p style="margin:0 0 8px;font-size:16px;">
+      <strong>Grand total (items):</strong>
+      <span style="color:#C7992E;font-size:18px;">${total}</span>
+    </p>
+    <p style="margin:0;font-size:13px;color:#666;">
+      Delivery fee is paid by the customer — confirm cost on WhatsApp.
+    </p>
+  </div>
+</div>`;
 }
 
 /**
  * Sends two emails via EmailJS:
- * 1. Full order details → shop
+ * 1. Full order table → shop
  * 2. Branded confirmation → customer
  */
 export async function sendOrderEmails({ items, customer, totalPrice }) {
@@ -123,19 +186,23 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
     .filter(Boolean)
     .join(", ");
   const total = `₦${Number(totalPrice || 0).toLocaleString()}`;
-  const htmlBody = customerEmailHtml({
+
+  const customerHtml = customerEmailHtml({
     id,
     name: customer.customerName,
     itemsHtml,
     total,
   });
-  const shopMessage = shopEmailText({
+
+  const shopHtml = shopEmailHtml({
     id,
     customer,
     address,
-    itemsText,
+    items,
     total,
   });
+
+  const shopSubject = `A New Order Tracked - Order Number ${id}`;
 
   const base = {
     order_id: id,
@@ -151,9 +218,7 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
     name: customer.customerName || "",
     email: customer.email || "",
     phone: customer.phone || "",
-    title: `Order ${id}`,
-    message: shopMessage,
-    html_body: htmlBody,
+    title: shopSubject,
   };
 
   if (!isEmailConfigured()) {
@@ -164,20 +229,19 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
   }
 
   try {
-    // Shop notification (Contact Us template uses name / email / message)
     await emailjs.send(
       SERVICE_ID,
       TEMPLATE_SHOP,
       {
         ...base,
         to_email: shopOrderEmail,
-        subject: `New order ${id} — ${customer.customerName || "Customer"}`,
-        message: shopMessage,
+        subject: shopSubject,
+        message: shopHtml,
+        html_body: shopHtml,
       },
       PUBLIC_KEY
     );
 
-    // Customer confirmation — template should contain only {{{html_body}}} or {{message}}
     await emailjs.send(
       SERVICE_ID,
       TEMPLATE_CUSTOMER,
@@ -185,8 +249,8 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
         ...base,
         to_email: customer.email,
         subject: `Order ${id} confirmed — Shop with Dee`,
-        message: htmlBody,
-        html_body: htmlBody,
+        message: customerHtml,
+        html_body: customerHtml,
       },
       PUBLIC_KEY
     );

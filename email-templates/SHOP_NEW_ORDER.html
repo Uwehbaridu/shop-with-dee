@@ -4,19 +4,10 @@
   Settings:
   - To Email: shopwithdee07@gmail.com
   - From Name: Shop with Dee Orders
-  - Subject: New order {{order_id}} — {{customer_name}}
+  - Subject: {{subject}}
+    (or hardcode: A New Order Tracked - Order Number {{order_id}})
 
-  Body: paste below into the template editor
+  Body: delete everything and paste ONLY the line below
+  (triple braces so the HTML table renders)
 -->
-<p><strong>New website order</strong></p>
-<p>
-  <strong>Order ID:</strong> {{order_id}}<br/>
-  <strong>Name:</strong> {{customer_name}}<br/>
-  <strong>Email:</strong> {{customer_email}}<br/>
-  <strong>Phone:</strong> {{customer_phone}} (WhatsApp: {{is_whatsapp}})<br/>
-  <strong>Delivery:</strong> {{delivery_address}}
-</p>
-<p><strong>Items</strong></p>
-<pre style="font-family: Arial, sans-serif; white-space: pre-wrap;">{{items_list}}</pre>
-<p><strong>Total:</strong> {{grand_total}}</p>
-<p>Confirm availability and delivery fee on WhatsApp.</p>
+{{{html_body}}}
