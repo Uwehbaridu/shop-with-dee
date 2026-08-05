@@ -1,48 +1,6 @@
 <!--
-  PASTE THIS into EmailJS → Order Confirmation (template_orndzp8)
-
-  Settings:
-  - To Email: {{to_email}}
-  - From Name: Shop with Dee
-  - Subject: Order {{order_id}} confirmed — Shop with Dee
-
-  Delete the default Order Confirmation design and paste the <div> below.
+  Option A (simplest): body = {{message}}
+  Subject: Order {{order_id}} confirmed — Shop with Dee
+  To: {{to_email}}
 -->
-<div style="font-family: Arial, Helvetica, sans-serif; max-width: 560px; margin: 0 auto; color: #1C1410; line-height: 1.55;">
-  <div style="text-align: center; padding: 28px 20px 12px; background: #180F0A;">
-    <p style="margin: 0; font-size: 12px; letter-spacing: 0.28em; color: #E4C878; text-transform: uppercase;">Shop with Dee</p>
-    <p style="margin: 8px 0 0; font-size: 13px; color: #F8F3E9; opacity: 0.8;">Luxury for less</p>
-  </div>
-
-  <div style="padding: 28px 24px;">
-    <p style="text-align: right; color: #999; font-size: 12px; margin: 0 0 20px; letter-spacing: 0.04em;">ORDER {{order_id}}</p>
-
-    <h1 style="font-size: 22px; font-weight: 600; margin: 0 0 12px;">Thank you for your order!</h1>
-
-    <p style="color: #555; margin: 0 0 18px; font-size: 15px;">
-      Hi {{customer_name}}, we’ve received your pre-order. Your order number is
-      <strong>{{order_id}}</strong>.
-    </p>
-
-    <p style="margin: 0 0 8px; font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 0.06em;">Items</p>
-    <pre style="font-family: Arial, Helvetica, sans-serif; white-space: pre-wrap; background: #F8F3E9; padding: 14px 16px; border-radius: 8px; font-size: 13px; line-height: 1.6;">{{items_list}}</pre>
-
-    <p style="margin: 16px 0 20px; font-size: 16px;">
-      <strong>Total:</strong> <span style="color: #C7992E;">{{grand_total}}</span>
-    </p>
-
-    <p style="color: #555; font-size: 14px; margin: 0 0 12px;">
-      We’ll confirm availability and delivery cost on WhatsApp shortly.
-      <strong>Delivery fee will be paid by you.</strong>
-    </p>
-
-    <p style="color: #555; font-size: 14px; margin: 0 0 28px;">
-      Please check your items at delivery before signing. Thank you for shopping with us — classic never goes out of fashion.
-    </p>
-
-    <p style="margin: 0; font-size: 13px; color: #C7992E;">
-      — Shop with Dee<br />
-      <span style="color: #888;">Port Harcourt, Rivers State</span>
-    </p>
-  </div>
-</div>
+{{message}}

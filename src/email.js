@@ -29,10 +29,67 @@ function orderId() {
   return `SWD-${n}`;
 }
 
+function buildShopMessage({ id, customer, address, itemsText, total }) {
+  return [
+    "══════════════════════════════════",
+    "  A NEW ORDER TRACKED",
+    `  Order Number: ${id}`,
+    "══════════════════════════════════",
+    "",
+    "CUSTOMER DETAILS",
+    "──────────────────────────────────",
+    `Name:     ${customer.customerName || "—"}`,
+    `Email:    ${customer.email || "—"}`,
+    `Phone:    ${customer.phone || "—"}`,
+    `WhatsApp: ${customer.isWhatsApp ? "Yes" : "No"}`,
+    `Delivery: ${address || "—"}`,
+    "",
+    "ORDER ITEMS",
+    "──────────────────────────────────",
+    itemsText,
+    "",
+    "──────────────────────────────────",
+    `GRAND TOTAL (items): ${total}`,
+    "──────────────────────────────────",
+    "",
+    "Note: Delivery fee is paid by the customer.",
+    "Confirm availability and delivery cost on WhatsApp.",
+  ].join("\n");
+}
+
+function buildCustomerMessage({ id, customer, itemsText, total }) {
+  return [
+    "Shop with Dee",
+    "Luxury for less",
+    "",
+    `ORDER ${id}`,
+    "",
+    `Hi ${customer.customerName || "there"},`,
+    "",
+    "Thank you for your order!",
+    `We've received your pre-order. Your order number is ${id}.`,
+    "",
+    "ITEMS",
+    "──────────────────────────────────",
+    itemsText,
+    "",
+    `TOTAL: ${total}`,
+    "",
+    "We'll confirm availability and delivery cost on WhatsApp shortly.",
+    "Delivery fee will be paid by you.",
+    "",
+    "Please check your items at delivery before signing.",
+    "",
+    "Thank you for shopping with us — classic never goes out of fashion.",
+    "",
+    "— Shop with Dee",
+    "Port Harcourt, Rivers State",
+  ].join("\n");
+}
+
 /**
- * Sends two emails via EmailJS.
- * Templates must use variables like {{order_id}}, {{customer_name}}, {{items_list}}
- * (HTML layout lives IN the EmailJS template — see email-templates/ folder).
+ * Sends two emails via EmailJS (shop + customer).
+ * Content is in the `message` field so default Contact Us / simple templates work.
  */
 export async function sendOrderEmails({ items, customer, totalPrice }) {
   const id = orderId();
@@ -42,28 +99,23 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
     .join(", ");
   const total = `₦${Number(totalPrice || 0).toLocaleString()}`;
   const shopSubject = `A New Order Tracked - Order Number ${id}`;
+  const customerSubject = `Order ${id} confirmed — Shop with Dee`;
 
-  // Plain-text message (always readable even if template is simple)
-  const plainMessage = [
-    `A NEW ORDER TRACKED`,
-    `Order Number: ${id}`,
-    ``,
-    `CUSTOMER DETAILS`,
-    `Name: ${customer.customerName || "—"}`,
-    `Email: ${customer.email || "—"}`,
-    `Phone: ${customer.phone || "—"}`,
-    `WhatsApp: ${customer.isWhatsApp ? "Yes" : "No"}`,
-    `Delivery: ${address || "—"}`,
-    ``,
-    `ORDER ITEMS`,
+  const shopMessage = buildShopMessage({
+    id,
+    customer,
+    address,
     itemsText,
-    ``,
-    `GRAND TOTAL (items): ${total}`,
-    ``,
-    `Note: Delivery fee is paid by the customer — confirm cost on WhatsApp.`,
-  ].join("\n");
+    total,
+  });
+  const customerMessage = buildCustomerMessage({
+    id,
+    customer,
+    itemsText,
+    total,
+  });
 
-  const params = {
+  const shared = {
     order_id: id,
     customer_name: customer.customerName || "",
     customer_phone: customer.phone || "",
@@ -74,13 +126,9 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
     grand_total: total,
     shop_email: shopOrderEmail,
     brand: siteConfig.brand,
-    // Common EmailJS field names
     name: customer.customerName || "",
     email: customer.email || "",
     phone: customer.phone || "",
-    title: shopSubject,
-    subject: shopSubject,
-    message: plainMessage,
   };
 
   if (!isEmailConfigured()) {
@@ -95,8 +143,11 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
       SERVICE_ID,
       TEMPLATE_SHOP,
       {
-        ...params,
+        ...shared,
         to_email: shopOrderEmail,
+        subject: shopSubject,
+        title: shopSubject,
+        message: shopMessage,
       },
       PUBLIC_KEY
     );
@@ -105,26 +156,11 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
       SERVICE_ID,
       TEMPLATE_CUSTOMER,
       {
-        ...params,
+        ...shared,
         to_email: customer.email,
-        subject: `Order ${id} confirmed — Shop with Dee`,
-        title: `Order ${id} confirmed`,
-        message: [
-          `Hi ${customer.customerName || "there"},`,
-          ``,
-          `Thank you for your order with Shop with Dee!`,
-          `Order number: ${id}`,
-          ``,
-          `Items:`,
-          itemsText,
-          ``,
-          `Total: ${total}`,
-          ``,
-          `We'll confirm delivery cost on WhatsApp shortly.`,
-          `Delivery fee will be paid by you.`,
-          ``,
-          `— Shop with Dee`,
-        ].join("\n"),
+        subject: customerSubject,
+        title: customerSubject,
+        message: customerMessage,
       },
       PUBLIC_KEY
     );
