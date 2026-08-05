@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { buildCartWhatsAppLink } from "../config";
 import { useCart } from "../cart";
-import { sendOrderEmails, isEmailConfigured } from "../email";
+import { sendOrderEmails } from "../email";
+import { saveLastOrder } from "../pages/OrderConfirmation";
 
 const NIGERIAN_STATES = [
   "Abia",
@@ -54,10 +56,10 @@ const initial = {
 };
 
 export default function CheckoutForm({ onClose }) {
+  const navigate = useNavigate();
   const { items, totalPrice, clearCart, closeCart } = useCart();
   const [form, setForm] = useState(initial);
   const [submitting, setSubmitting] = useState(false);
-  const [status, setStatus] = useState(null); // null | 'ok' | 'email-failed'
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
@@ -70,7 +72,6 @@ export default function CheckoutForm({ onClose }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
-    setStatus(null);
 
     const customer = {
       customerName: form.name.trim(),
@@ -82,35 +83,47 @@ export default function CheckoutForm({ onClose }) {
       address: form.address.trim(),
     };
 
+    // Snapshot items before clearing cart
+    const orderItems = items.map((item) => ({
+      key: item.key,
+      name: item.name,
+      designName: item.designName,
+      size: item.size,
+      quantity: item.quantity,
+      price: item.price,
+      image: item.image,
+    }));
+
     const emailResult = await sendOrderEmails({
       items,
       customer,
       totalPrice,
     });
 
-    const url = buildCartWhatsAppLink(items, {
+    const whatsappUrl = buildCartWhatsAppLink(items, {
       ...customer,
       orderId: emailResult.orderId,
     });
 
-    window.open(url, "_blank", "noopener,noreferrer");
+    const order = {
+      orderId: emailResult.orderId,
+      customer,
+      items: orderItems,
+      totalPrice,
+      placedAt: new Date().toISOString(),
+      whatsappUrl,
+      emailSent: Boolean(emailResult.ok),
+    };
 
-    if (emailResult.ok) {
-      setStatus("ok");
-    } else if (emailResult.skipped) {
-      setStatus("skipped");
-    } else {
-      setStatus("email-failed");
-    }
-
+    saveLastOrder(order);
     clearCart();
+    closeCart();
+    onClose();
     setSubmitting(false);
 
-    // Brief pause so customer sees confirmation, then close
-    setTimeout(() => {
-      closeCart();
-      onClose();
-    }, 1800);
+    // Open WhatsApp in a new tab, then show confirmation page
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    navigate("/order-confirmation", { state: { order } });
   }
 
   return (
@@ -140,7 +153,6 @@ export default function CheckoutForm({ onClose }) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-5">
-          {/* Order summary */}
           <div className="bg-white rounded-xl border border-ink/5 p-4">
             <p className="text-xs uppercase tracking-wide text-ink/40 mb-2">
               Order summary
@@ -167,7 +179,6 @@ export default function CheckoutForm({ onClose }) {
             </div>
           </div>
 
-          {/* Name */}
           <div>
             <label htmlFor="co-name" className="block text-sm font-medium text-ink/70 mb-1.5">
               Full name
@@ -183,7 +194,6 @@ export default function CheckoutForm({ onClose }) {
             />
           </div>
 
-          {/* Email */}
           <div>
             <label htmlFor="co-email" className="block text-sm font-medium text-ink/70 mb-1.5">
               Email address
@@ -203,7 +213,6 @@ export default function CheckoutForm({ onClose }) {
             </p>
           </div>
 
-          {/* Phone */}
           <div>
             <label htmlFor="co-phone" className="block text-sm font-medium text-ink/70 mb-1.5">
               Phone number
@@ -230,63 +239,47 @@ export default function CheckoutForm({ onClose }) {
             </label>
           </div>
 
-          {/* Delivery address */}
           <div className="space-y-3">
             <p className="text-sm font-medium text-ink/70">Delivery address</p>
 
-            <div>
-              <label htmlFor="co-state" className="sr-only">
-                State
-              </label>
-              <select
-                id="co-state"
-                name="state"
-                required
-                value={form.state}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm text-ink focus:border-gold outline-none appearance-none"
-              >
-                <option value="" disabled>
-                  Select state
+            <select
+              id="co-state"
+              name="state"
+              required
+              value={form.state}
+              onChange={handleChange}
+              className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm text-ink focus:border-gold outline-none appearance-none"
+            >
+              <option value="" disabled>
+                Select state
+              </option>
+              {NIGERIAN_STATES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
                 </option>
-                {NIGERIAN_STATES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
+              ))}
+            </select>
 
-            <div>
-              <label htmlFor="co-city" className="sr-only">
-                City
-              </label>
-              <input
-                id="co-city"
-                name="city"
-                required
-                value={form.city}
-                onChange={handleChange}
-                placeholder="City / LGA"
-                className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/35 focus:border-gold outline-none"
-              />
-            </div>
+            <input
+              id="co-city"
+              name="city"
+              required
+              value={form.city}
+              onChange={handleChange}
+              placeholder="City / LGA"
+              className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/35 focus:border-gold outline-none"
+            />
 
-            <div>
-              <label htmlFor="co-address" className="sr-only">
-                House address
-              </label>
-              <textarea
-                id="co-address"
-                name="address"
-                required
-                rows={2}
-                value={form.address}
-                onChange={handleChange}
-                placeholder="House address / street / landmark"
-                className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/35 focus:border-gold outline-none resize-none"
-              />
-            </div>
+            <textarea
+              id="co-address"
+              name="address"
+              required
+              rows={2}
+              value={form.address}
+              onChange={handleChange}
+              placeholder="House address / street / landmark"
+              className="w-full rounded-lg border border-ink/15 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/35 focus:border-gold outline-none resize-none"
+            />
           </div>
 
           <div className="rounded-xl bg-gold/10 border border-gold/25 px-4 py-3 text-sm text-espresso-dark/80">
@@ -294,23 +287,6 @@ export default function CheckoutForm({ onClose }) {
             paid by you. We’ll confirm the delivery cost on WhatsApp after your
             order. You’ll also get a confirmation email.
           </div>
-
-          {status === "ok" && (
-            <p className="text-sm text-center text-espresso-dark bg-gold/15 rounded-xl px-4 py-3">
-              Order received — confirmation email sent. Opening WhatsApp…
-            </p>
-          )}
-          {status === "email-failed" && (
-            <p className="text-sm text-center text-ink/70 bg-white border border-ink/10 rounded-xl px-4 py-3">
-              WhatsApp opened. If you don’t get an email, we’ll still follow up
-              on WhatsApp.
-            </p>
-          )}
-          {status === "skipped" && !isEmailConfigured() && (
-            <p className="text-sm text-center text-ink/70 bg-white border border-ink/10 rounded-xl px-4 py-3">
-              Opening WhatsApp to complete your order…
-            </p>
-          )}
 
           <button
             type="submit"

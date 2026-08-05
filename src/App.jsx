@@ -10,6 +10,7 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import CartDrawer from "./components/CartDrawer";
 import ProductPage from "./pages/ProductPage";
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 function HomePage() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/product/:id" element={<ProductPage />} />
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
         </Routes>
       </CartProvider>
     </BrowserRouter>
