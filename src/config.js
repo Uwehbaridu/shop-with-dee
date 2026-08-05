@@ -4,8 +4,10 @@ export const siteConfig = {
   brand: "Shop with Dee",
   tagline: "The fashion hub — luxury for less",
   subtagline: "Classic never goes out of fashion.",
-  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || "2349126783004", // no + or spaces
+  whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER || "2349126783004",
   orderEmail: import.meta.env.VITE_ORDER_EMAIL || "shopwithdee07@gmail.com",
+  // Public site URL (no trailing slash) — used in confirmation emails
+  siteUrl: import.meta.env.VITE_SITE_URL || (typeof window !== "undefined" ? window.location.origin : ""),
   callNumber: "+234 810 993 3872",
   callNumberHref: "+2348109933872",
   instagramHandle: "@shopwithdee",
@@ -13,9 +15,6 @@ export const siteConfig = {
   location: "Port Harcourt, Rivers State, Nigeria",
 };
 
-/**
- * Builds a wa.me link that opens WhatsApp with a pre-filled order message.
- */
 export function buildWhatsAppLink(product, options = {}) {
   const base = `https://wa.me/${siteConfig.whatsappNumber}`;
 
@@ -38,9 +37,6 @@ export function buildWhatsAppLink(product, options = {}) {
   return `${base}?text=${encodeURIComponent(message)}`;
 }
 
-/**
- * Builds a WhatsApp link for a multi-item cart order with customer details.
- */
 export function buildCartWhatsAppLink(items, customer = {}) {
   const base = `https://wa.me/${siteConfig.whatsappNumber}`;
 

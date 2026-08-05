@@ -29,6 +29,33 @@ function orderId() {
   return `SWD-${n}`;
 }
 
+function absoluteImageUrl(src) {
+  if (!src || typeof src !== "string") return "";
+  if (src.startsWith("http://") || src.startsWith("https://")) return src;
+  const origin =
+    import.meta.env.VITE_SITE_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "");
+  if (!origin) return "";
+  if (src.startsWith("/")) return `${origin.replace(/\/$/, "")}${src}`;
+  return `${origin.replace(/\/$/, "")}/${src}`;
+}
+
+/** Shape required by EmailJS Order Confirmation {{#orders}} block */
+function buildOrdersArray(items) {
+  return items.map((item) => {
+    const line = item.price * item.quantity;
+    const label = item.designName
+      ? `${item.name} — ${item.designName}`
+      : item.name;
+    return {
+      name: `${label} (Size ${item.size})`,
+      units: item.quantity,
+      price: line.toLocaleString("en-NG"),
+      image_url: absoluteImageUrl(item.image),
+    };
+  });
+}
+
 function buildShopMessage({ id, customer, address, itemsText, total }) {
   return [
     "══════════════════════════════════",
@@ -57,63 +84,35 @@ function buildShopMessage({ id, customer, address, itemsText, total }) {
   ].join("\n");
 }
 
-function buildCustomerMessage({ id, customer, itemsText, total }) {
-  return [
-    "Shop with Dee",
-    "Luxury for less",
-    "",
-    `ORDER ${id}`,
-    "",
-    `Hi ${customer.customerName || "there"},`,
-    "",
-    "Thank you for your order!",
-    `We've received your pre-order. Your order number is ${id}.`,
-    "",
-    "ITEMS",
-    "──────────────────────────────────",
-    itemsText,
-    "",
-    `TOTAL: ${total}`,
-    "",
-    "We'll confirm availability and delivery cost on WhatsApp shortly.",
-    "Delivery fee will be paid by you.",
-    "",
-    "Please check your items at delivery before signing.",
-    "",
-    "Thank you for shopping with us — classic never goes out of fashion.",
-    "",
-    "— Shop with Dee",
-    "Port Harcourt, Rivers State",
-  ].join("\n");
-}
-
-/**
- * Sends two emails via EmailJS (shop + customer).
- * Content is in the `message` field so default Contact Us / simple templates work.
- */
 export async function sendOrderEmails({ items, customer, totalPrice }) {
   const id = orderId();
   const itemsText = formatItems(items);
   const address = [customer.address, customer.city, customer.state]
     .filter(Boolean)
     .join(", ");
-  const total = `₦${Number(totalPrice || 0).toLocaleString()}`;
+  const totalNum = Number(totalPrice || 0);
+  const total = `₦${totalNum.toLocaleString()}`;
   const shopSubject = `A New Order Tracked - Order Number ${id}`;
-  const customerSubject = `Order ${id} confirmed — Shop with Dee`;
+  const customerSubject = `Order Confirmed #${id}!`;
 
-  const shopMessage = buildShopMessage({
-    id,
-    customer,
-    address,
-    itemsText,
-    total,
-  });
-  const customerMessage = buildCustomerMessage({
-    id,
-    customer,
-    itemsText,
-    total,
-  });
+  const siteUrl =
+    import.meta.env.VITE_SITE_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "") ||
+    siteConfig.siteUrl ||
+    "";
+
+  const viewOrderUrl = siteUrl
+    ? `${siteUrl.replace(/\/$/, "")}/order-confirmation`
+    : "#";
+
+  const orders = buildOrdersArray(items);
+
+  // EmailJS Order Confirmation template expects cost.* as strings
+  const cost = {
+    shipping: "To confirm",
+    tax: "0",
+    total: totalNum.toLocaleString("en-NG"),
+  };
 
   const shared = {
     order_id: id,
@@ -129,6 +128,10 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
     name: customer.customerName || "",
     email: customer.email || "",
     phone: customer.phone || "",
+    orders,
+    cost,
+    view_order_url: viewOrderUrl,
+    site_url: siteUrl || viewOrderUrl,
   };
 
   if (!isEmailConfigured()) {
@@ -147,7 +150,13 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
         to_email: shopOrderEmail,
         subject: shopSubject,
         title: shopSubject,
-        message: shopMessage,
+        message: buildShopMessage({
+          id,
+          customer,
+          address,
+          itemsText,
+          total,
+        }),
       },
       PUBLIC_KEY
     );
@@ -160,7 +169,13 @@ export async function sendOrderEmails({ items, customer, totalPrice }) {
         to_email: customer.email,
         subject: customerSubject,
         title: customerSubject,
-        message: customerMessage,
+        message: buildShopMessage({
+          id,
+          customer,
+          address,
+          itemsText,
+          total,
+        }),
       },
       PUBLIC_KEY
     );

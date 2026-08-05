@@ -1,6 +1,110 @@
 <!--
-  Option A (simplest): body = {{message}}
-  Subject: Order {{order_id}} confirmed — Shop with Dee
-  To: {{to_email}}
+  PASTE THIS into EmailJS → Order Confirmation (template_orndzp8)
+
+  Settings:
+  - To Email: {{to_email}}
+  - Subject: Order Confirmed #{{order_id}}!
+  - From Name: Shop with Dee
+
+  LOGO: In the EmailJS template editor, upload your Shop with Dee logo
+  and keep src="cid:logo.png" OR replace the img src with a public https URL.
 -->
-{{message}}
+<div style="font-family: system-ui, sans-serif, Arial; font-size: 14px; color: #1C1410; padding: 14px 8px; background-color: #F4F1EC;">
+  <div style="max-width: 600px; margin: auto; background-color: #fff; border-radius: 8px; overflow: hidden;">
+    <div style="border-top: 6px solid #C7992E; padding: 16px 16px 12px; background: #180F0A;">
+      <a style="text-decoration: none; outline: none; margin-right: 8px; vertical-align: middle;" href="{{site_url}}" target="_blank">
+        <img style="height: 36px; vertical-align: middle; border-radius: 50%;" height="36" src="cid:logo.png" alt="Shop with Dee" />
+      </a>
+      <span style="font-size: 15px; vertical-align: middle; border-left: 1px solid #E4C878; padding-left: 10px; color: #F8F3E9;">
+        <strong>Shop with Dee</strong>
+      </span>
+    </div>
+
+    <div style="padding: 20px 16px;">
+      <h1 style="margin: 0 0 8px; font-size: 20px; color: #1C1410;">Thank You for Your Order</h1>
+      <p style="margin: 0 0 16px; color: #555;">
+        Hi {{customer_name}}, we've received your pre-order. We'll confirm delivery on WhatsApp shortly.
+      </p>
+
+      <div style="text-align: left; font-size: 14px; padding-bottom: 8px; border-bottom: 2px solid #1C1410;">
+        <strong>Order # {{order_id}}</strong>
+      </div>
+
+      {{#orders}}
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr style="vertical-align: top;">
+          <td style="padding: 20px 8px 0 4px; width: 72px;">
+            {{#image_url}}
+            <img style="height: 64px; width: 64px; object-fit: cover; border-radius: 6px;" height="64" src="{{image_url}}" alt="item" />
+            {{/image_url}}
+          </td>
+          <td style="padding: 20px 8px 0 8px; width: 100%;">
+            <div style="font-weight: 600;">{{name}}</div>
+            <div style="font-size: 13px; color: #888; padding-top: 4px;">QTY: {{units}}</div>
+          </td>
+          <td style="padding: 20px 4px 0 0; white-space: nowrap; color: #C7992E;">
+            <strong>₦{{price}}</strong>
+          </td>
+        </tr>
+      </table>
+      {{/orders}}
+
+      <div style="padding: 20px 0 8px;">
+        <div style="border-top: 2px solid #1C1410;"></div>
+      </div>
+
+      <table style="border-collapse: collapse; width: 100%; text-align: right; font-size: 14px;">
+        <tr>
+          <td style="width: 55%;"></td>
+          <td style="padding: 6px 8px; color: #666;">Shipping</td>
+          <td style="padding: 6px 0; white-space: nowrap; color: #666;">{{cost.shipping}}</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="padding: 6px 8px; color: #666;">Delivery note</td>
+          <td style="padding: 6px 0; white-space: nowrap; color: #666;">Paid by you</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="padding: 12px 8px; border-top: 2px solid #1C1410;">
+            <strong>Order Total</strong>
+          </td>
+          <td style="padding: 12px 0; border-top: 2px solid #1C1410; white-space: nowrap;">
+            <strong style="color: #C7992E; font-size: 16px;">₦{{cost.total}}</strong>
+          </td>
+        </tr>
+      </table>
+
+      <div style="text-align: center; padding: 28px 0 12px;">
+        <a
+          href="{{view_order_url}}"
+          target="_blank"
+          style="
+            display: inline-block;
+            background: #180F0A;
+            color: #F8F3E9;
+            text-decoration: none;
+            padding: 12px 28px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 14px;
+          "
+        >
+          View your order
+        </a>
+      </div>
+
+      <p style="text-align: center; margin: 8px 0 0;">
+        <a href="{{site_url}}" target="_blank" style="color: #C7992E; font-size: 13px;">Visit our store</a>
+      </p>
+    </div>
+  </div>
+
+  <div style="max-width: 600px; margin: 16px auto 0; text-align: center;">
+    <p style="color: #999; font-size: 12px; line-height: 1.5;">
+      This email was sent to {{email}}<br />
+      You received this because you placed an order with Shop with Dee.<br />
+      Port Harcourt, Rivers State, Nigeria
+    </p>
+  </div>
+</div>
